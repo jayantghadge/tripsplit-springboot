@@ -28,6 +28,7 @@ export default function TripList() {
   const { user } = useAuth()
   const [trips, setTrips] = useState([])
   const [loading, setLoading] = useState(true)
+  const [activeFilter, setActiveFilter] = useState(null)
 
   useEffect(() => {
     api.getTrips()
@@ -37,6 +38,33 @@ export default function TripList() {
   }, [])
 
   const greeting = getGreeting()
+  const currentYear = new Date().getFullYear()
+
+  function getTripYear(t) {
+    const d = t.startDate || t.endDate || t.createdAt
+    if (!d) return null
+    return new Date(d).getFullYear()
+  }
+
+  const filteredTrips = trips.filter(t => {
+    if (activeFilter === 'destinations') return !!t.destination
+    if (activeFilter === 'thisYear') return getTripYear(t) === currentYear
+    return true
+  })
+
+  function handleStatClick(filter) {
+    if (activeFilter === filter) {
+      setActiveFilter(null)
+    } else {
+      setActiveFilter(filter)
+    }
+    if (filter === 'trips') {
+      document.getElementById('trips-section')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const destinationCount = trips.filter(t => t.destination).length
+  const thisYearCount = trips.filter(t => getTripYear(t) === currentYear).length
 
   return (
     <div className="container">
@@ -55,11 +83,18 @@ export default function TripList() {
       {/* Stats */}
       {!loading && trips.length > 0 && (
         <div className="stats-grid">
-          <div className="stat-card">
+          <div
+            className={`stat-card stat-card-clickable ${activeFilter === null || activeFilter === 'trips' ? 'stat-card-active' : ''}`}
+            onClick={() => handleStatClick('trips')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && handleStatClick('trips')}
+            title="Show all trips"
+          >
             <div className="stat-icon stat-icon-purple">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17.5 5.5C19 7 20 9 20 12c0 3-1 5-2.5 6.5" />
-                <path d="M6.5 5.5C5 7 4 9 4 12c0 3 1 5 2.5 6.5" />
+                <path d="M6.5 5.5C5 7 4 9 4 12c0 3-1 5-2.5 6.5" />
                 <path d="M9 5c0-1.7 1.3-3 3-3s3 1.3 3 3v14c0 1.7-1.3 3-3 3s-3-1.3-3-3V5z" />
                 <line x1="2" y1="12" x2="22" y2="12" />
               </svg>
@@ -69,7 +104,14 @@ export default function TripList() {
               <div className="stat-label">Active trips</div>
             </div>
           </div>
-          <div className="stat-card">
+          <div
+            className={`stat-card stat-card-clickable ${activeFilter === 'destinations' ? 'stat-card-active' : ''}`}
+            onClick={() => handleStatClick('destinations')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && handleStatClick('destinations')}
+            title={destinationCount > 0 ? `Show ${destinationCount} trips with destinations` : 'No destinations yet'}
+          >
             <div className="stat-icon stat-icon-green">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 1v22" />
@@ -77,11 +119,18 @@ export default function TripList() {
               </svg>
             </div>
             <div className="stat-info">
-              <div className="stat-value">{trips.filter(t => t.destination).length}</div>
+              <div className="stat-value">{destinationCount}</div>
               <div className="stat-label">Destinations</div>
             </div>
           </div>
-          <div className="stat-card">
+          <div
+            className={`stat-card stat-card-clickable ${activeFilter === 'thisYear' ? 'stat-card-active' : ''}`}
+            onClick={() => handleStatClick('thisYear')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && handleStatClick('thisYear')}
+            title={thisYearCount > 0 ? `Show ${thisYearCount} trips from ${currentYear}` : `No trips in ${currentYear}`}
+          >
             <div className="stat-icon stat-icon-amber">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
@@ -89,21 +138,30 @@ export default function TripList() {
               </svg>
             </div>
             <div className="stat-info">
-              <div className="stat-value">{new Date().getFullYear()}</div>
+              <div className="stat-value">{thisYearCount}</div>
               <div className="stat-label">This year</div>
             </div>
           </div>
         </div>
       )}
+      {activeFilter && !loading && (
+        <div className="filter-bar">
+          <span className="filter-label">
+            {activeFilter === 'destinations' && `Showing ${filteredTrips.length} trips with destinations`}
+            {activeFilter === 'thisYear' && `Showing ${filteredTrips.length} trips from ${currentYear}`}
+          </span>
+          <button className="btn-ghost btn-sm" onClick={() => setActiveFilter(null)}>Clear filter</button>
+        </div>
+      )}
 
       {/* Trips Section Header */}
-      <div className="section-header">
+      <div className="section-header" id="trips-section">
         <span className="section-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary-500)' }}>
             <circle cx="12" cy="10" r="3" />
             <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z" />
           </svg>
-          Trips
+          Trips {activeFilter && `(${filteredTrips.length})`}
         </span>
         <button className="btn-primary btn-sm" onClick={() => navigate('/trips/new')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -148,7 +206,13 @@ export default function TripList() {
       )}
 
       {/* Trip Cards */}
-      {!loading && trips.map(t => {
+      {!loading && filteredTrips.length === 0 && trips.length > 0 && (
+        <div className="card" style={{ textAlign: 'center', padding: '32px 24px' }}>
+          <p style={{ color: 'var(--text-tertiary)', fontSize: 14 }}>No trips match this filter.</p>
+          <button className="btn-ghost btn-sm" style={{ marginTop: 12 }} onClick={() => setActiveFilter(null)}>Show all trips</button>
+        </div>
+      )}
+      {!loading && filteredTrips.map(t => {
         const dateRange = formatDateRange(t.startDate, t.endDate)
         return (
           <div key={t.id} className="card trip-card" onClick={() => navigate(`/trips/${t.id}`)}>

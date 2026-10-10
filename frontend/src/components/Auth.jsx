@@ -1,11 +1,15 @@
 import React, { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Auth() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { login, register } = useAuth()
+  const { login, register, isAuthenticated, loading: authLoading } = useAuth()
+
+  if (!authLoading && isAuthenticated) {
+    return <Navigate to="/trips" replace />
+  }
 
   const [isRegister, setIsRegister] = useState(searchParams.get('register') === '1')
   const [name, setName] = useState('')

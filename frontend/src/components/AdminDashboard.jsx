@@ -39,17 +39,42 @@ export default function AdminDashboard() {
   if (loading) return <div className="page-loading"><div className="spinner" /></div>
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-header">
-        <h2>Admin Dashboard</h2>
-        <p className="text-tertiary">System overview and user management</p>
+    <div className="admin-dashboard container">
+      <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <button className="btn-ghost btn-sm" onClick={() => navigate('/trips')} style={{ marginLeft: -8 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              Back to Trips
+            </button>
+          </div>
+          <h2>Admin Dashboard</h2>
+          <p className="text-tertiary">System overview and user management</p>
+        </div>
+        <button className="btn-secondary btn-sm" onClick={() => navigate('/trips')}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Go to Trips
+        </button>
       </div>
 
       {error && <div className="auth-error">{error}</div>}
 
       {stats && (
         <div className="stats-grid">
-          <div className="stat-card">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => document.getElementById('admin-users')?.scrollIntoView({ behavior: 'smooth' })}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && document.getElementById('admin-users')?.scrollIntoView({ behavior: 'smooth' })}
+            title="Scroll to users"
+          >
             <div className="stat-icon stat-icon-users">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -63,7 +88,14 @@ export default function AdminDashboard() {
               <span className="stat-label"> Users</span>
             </div>
           </div>
-          <div className="stat-card">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate('/trips')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && navigate('/trips')}
+            title="Go to trips"
+          >
             <div className="stat-icon stat-icon-trips">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -76,7 +108,14 @@ export default function AdminDashboard() {
               <span className="stat-label"> Trips</span>
             </div>
           </div>
-          <div className="stat-card">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate('/trips')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && navigate('/trips')}
+            title="View trips to see expenses"
+          >
             <div className="stat-icon stat-icon-expenses">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="1" x2="12" y2="23" />
@@ -88,7 +127,14 @@ export default function AdminDashboard() {
               <span className="stat-label"> Expenses</span>
             </div>
           </div>
-          <div className="stat-card">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate('/trips')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => e.key === 'Enter' && navigate('/trips')}
+            title="View trips to see settlements"
+          >
             <div className="stat-icon stat-icon-settlements">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -102,7 +148,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="admin-section">
+      <div className="admin-section" id="admin-users">
         <h3>Users</h3>
         <div className="table-wrapper">
           <table className="admin-table">

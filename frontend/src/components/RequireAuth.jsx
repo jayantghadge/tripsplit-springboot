@@ -20,3 +20,26 @@ export default function RequireAuth({ children }) {
 
   return children
 }
+
+export function RequireAdmin({ children }) {
+  const { isAuthenticated, isAdmin, loading } = useAuth()
+  const location = useLocation()
+
+  if (loading) {
+    return (
+      <div className="page-loading">
+        <div className="spinner" />
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/trips" replace />
+  }
+
+  return children
+}
