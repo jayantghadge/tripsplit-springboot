@@ -1,0 +1,47 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+
+.container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+.card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
+
+h1 { font-size: 28px; margin-bottom: 8px; }
+h2 { font-size: 20px; margin-bottom: 16px; }
+
+input, select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 12px; }
+input:focus { outline: none; border-color: #6366f1; }
+
+button { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; }
+.btn-primary { background: #6366f1; color: white; }
+.btn-primary:hover { background: #4f46e5; }
+.btn-secondary { background: #e5e7eb; color: #374151; }
+.btn-danger { background: #ef4444; color: white; }
+
+.nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px 0; border-bottom: 1px solid #e5e7eb; }
+.nav h1 { font-size: 22px; margin: 0; }
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+
+.hidden { display: none !important; }
+
+.trip-card { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.trip-card:hover { background: #f9fafb; }
+
+.expense-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.expense-item:last-child { border-bottom: none; }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; background: #e0e7ff; color: #4338ca; margin-right: 4px; }
+
+.form-row { display: flex; gap: 12px; }
+.form-row > * { flex: 1; }
+
+.settlement-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+
+.badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.badge-admin { background: #fef3c7; color: #92400e; }
+.badge-member { background: #dbeafe; color: #1e40af; }
+
+@media (max-width: 600px) {
+    .form-row { flex-direction: column; gap: 0; }
+    .container { padding: 12px; }
+    .card { padding: 16px; }
+}

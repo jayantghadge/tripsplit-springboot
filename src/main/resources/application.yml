@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: tripsplit
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/tripsplit
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-me-in-production-use-a-256-bit-key-minimum}
+    expiration-ms: 86400000
