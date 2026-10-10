@@ -50,7 +50,11 @@ public class ExpenseController {
         expense.setId(null);
         expense.setCreatedAt(Instant.now());
         if (expense.getSplits() != null) {
+            Set<String> seen = new HashSet<>();
             for (ExpenseSplit split : expense.getSplits()) {
+                String key = split.getMemberName() != null ? split.getMemberName().trim().toLowerCase() : "";
+                if (key.isEmpty()) return ResponseEntity.badRequest().body(new ApiError("Split member name is required"));
+                if (!seen.add(key)) return ResponseEntity.badRequest().body(new ApiError("Duplicate member in splits: " + split.getMemberName()));
                 split.setSettled(false);
             }
         }
@@ -82,7 +86,11 @@ public class ExpenseController {
         if (updated.getCategory() != null) expense.setCategory(updated.getCategory());
         if (updated.getDate() != null) expense.setDate(updated.getDate());
         if (updated.getSplits() != null) {
+            Set<String> seen = new HashSet<>();
             for (ExpenseSplit split : updated.getSplits()) {
+                String key = split.getMemberName() != null ? split.getMemberName().trim().toLowerCase() : "";
+                if (key.isEmpty()) return ResponseEntity.badRequest().body(new ApiError("Split member name is required"));
+                if (!seen.add(key)) return ResponseEntity.badRequest().body(new ApiError("Duplicate member in splits: " + split.getMemberName()));
                 split.setSettled(false);
             }
             expense.setSplits(updated.getSplits());

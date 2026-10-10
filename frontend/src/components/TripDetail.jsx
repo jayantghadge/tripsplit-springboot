@@ -116,6 +116,9 @@ export default function TripDetail() {
 
   const viewUrl = `${window.location.origin}/view/${viewToken}`
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0)
+  const uniqueSettlements = [...new Map(
+    settlements.map(s => [`${s.fromName}|${s.toName}|${s.amount}`, s])
+  ).values()]
 
   return (
     <div className="container">
@@ -364,11 +367,11 @@ export default function TripDetail() {
 
       {activeTab === 'settlements' && (
         <div className="tab-content">
-          {settlements.length === 0 ? (
+          {uniqueSettlements.length === 0 ? (
             <div className="empty-state">Click the Settlements tab to calculate who owes whom</div>
           ) : (
-            settlements.map((s, i) => (
-              <div key={i} className="settlement-row">
+            uniqueSettlements.map((s, i) => (
+              <div key={`${s.fromName}-${s.toName}-${s.amount}-${i}`} className="settlement-row">
                 <span className="settlement-from">{s.fromName}</span>
                 <span className="settlement-arrow">owes</span>
                 <span className="settlement-to">{s.toName}</span>

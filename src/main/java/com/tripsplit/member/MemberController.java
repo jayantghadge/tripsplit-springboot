@@ -38,8 +38,14 @@ public class MemberController {
         if (trip == null) return ResponseEntity.notFound().build();
         if (!trip.getCreatedBy().equals(userId) && !authUtils.isAdmin(userId))
             return ResponseEntity.status(403).body(new ApiError("Access denied"));
+        String cleanName = member.getName() != null ? member.getName().trim() : "";
+        if (cleanName.isEmpty()) return ResponseEntity.badRequest().body(new ApiError("Member name is required"));
+        boolean duplicate = memberRepository.findByTripId(tripId).stream()
+                .anyMatch(m -> m.getName().trim().equalsIgnoreCase(cleanName));
+        if (duplicate) return ResponseEntity.badRequest().body(new ApiError("Member already exists in this trip"));
         member.setId(null);
         member.setTripId(tripId);
+        member.setName(cleanName);
         return ResponseEntity.ok(memberRepository.save(member));
     }
 

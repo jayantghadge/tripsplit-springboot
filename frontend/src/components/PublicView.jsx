@@ -43,11 +43,17 @@ export default function PublicView() {
     )
   }
 
+  const uniqueSettlements = [...new Map(
+    (data.settlements || []).map(s => [`${s.fromName}|${s.toName}|${s.amount}`, s])
+  ).values()]
+
+  const trip = data.trip || data
+
   return (
     <div className="public-view">
       <div className="public-header">
-        <h1>{data.name}</h1>
-        {data.destination && <p>{data.destination}</p>}
+        <h1>{trip.name}</h1>
+        {trip.destination && <p>{trip.destination}</p>}
       </div>
 
       {/* Members */}
@@ -98,11 +104,11 @@ export default function PublicView() {
           Settlements
         </div>
         <div>
-          {data.settlements.length === 0 ? (
+          {uniqueSettlements.length === 0 ? (
             <div className="empty-state">All settled up!</div>
           ) : (
-            data.settlements.map((s, i) => (
-              <div key={i} className="settlement-row">
+            uniqueSettlements.map((s, i) => (
+              <div key={`${s.fromName}-${s.toName}-${s.amount}-${i}`} className="settlement-row">
                 <span className="settlement-from">{s.fromName}</span>
                 <span className="settlement-arrow">owes</span>
                 <span className="settlement-to">{s.toName}</span>

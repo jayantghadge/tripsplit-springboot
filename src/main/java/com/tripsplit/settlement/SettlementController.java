@@ -97,6 +97,7 @@ public class SettlementController {
             if (debtors.get(di).getValue().compareTo(BigDecimal.ZERO) == 0) di++;
         }
 
+        settlementRepository.deleteByTripId(tripId);
         List<Settlement> saved = settlementRepository.saveAll(settlements);
         return ResponseEntity.ok(saved);
     }

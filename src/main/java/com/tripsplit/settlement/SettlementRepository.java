@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface SettlementRepository extends MongoRepository<Settlement, String> {
     List<Settlement> findByTripId(String tripId);
     Optional<Settlement> findByTripIdAndFromNameAndToName(String tripId, String fromName, String toName);
+    void deleteByTripId(String tripId);
 }
