@@ -15,6 +15,7 @@ frontend/dist/
 src/main/resources/static/
 .env
 .env.*
+!**/.env.example
 *.log
 .DS_Store
 !gradle/wrapper/gradle-wrapper.jar

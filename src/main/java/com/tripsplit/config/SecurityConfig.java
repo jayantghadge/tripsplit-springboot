@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,9 +25,12 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtConfig jwtConfig;
+    private final String allowedOrigins;
 
-    public SecurityConfig(JwtConfig jwtConfig) {
+    public SecurityConfig(JwtConfig jwtConfig,
+                          @Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOrigins) {
         this.jwtConfig = jwtConfig;
+        this.allowedOrigins = allowedOrigins;
     }
 
     @Bean
@@ -37,7 +41,7 @@ public class SecurityConfig {
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/public/**", "/", "/index.html", "/assets/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/public/**", "/api/health", "/", "/index.html", "/assets/**", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -47,7 +51,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*"));
+        List<String> origins = java.util.Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+        if (origins.contains("*")) {
+            config.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            config.setAllowedOrigins(origins);
+        }
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
