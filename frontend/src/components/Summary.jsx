@@ -2,10 +2,25 @@ import React from 'react'
 import { rupee } from '../utils'
 import PieChart from './PieChart'
 
-export default function Summary({ data }) {
-  if (!data) return null
+export default function Summary({ data, currentUserName }) {
+  if (!data) {
+    return (
+      <div className="tab-content">
+        <div className="empty-state">Summary will appear here once you add expenses.</div>
+      </div>
+    )
+  }
 
-  const { totalSpent, categoryBreakdown, perPerson } = data
+  const { totalSpent = 0, categoryBreakdown = [], perPerson = [] } = data
+  const hasExpenses = Number(totalSpent) > 0 && perPerson.length > 0
+
+  if (!hasExpenses) {
+    return (
+      <div className="tab-content">
+        <div className="empty-state">No expenses yet. Add one to see the spending summary.</div>
+      </div>
+    )
+  }
 
   return (
     <div className="summary-section">
@@ -16,35 +31,35 @@ export default function Summary({ data }) {
 
       <div className="summary-grid">
         {/* By Category */}
-        <div className="card">
-          <div className="card-title">
-            <span className="dot dot-purple" />
-            By Category
-          </div>
-          <div className="summary-chart-row">
-            {categoryBreakdown && categoryBreakdown.length > 0 && (
+        {categoryBreakdown.length > 0 && (
+          <div className="card">
+            <div className="card-title">
+              <span className="dot dot-purple" />
+              By Category
+            </div>
+            <div className="summary-chart-row">
               <div className="summary-chart">
                 <PieChart data={categoryBreakdown} size={160} />
               </div>
-            )}
-            <div className="summary-chart-legend">
-              <div className="summary-list">
-                {categoryBreakdown && categoryBreakdown.map((c, i) => (
-                  <div key={i} className="summary-row">
-                    <div className="summary-row-left">
-                      <span className="color-dot" style={{ background: c.color }} />
-                      <span>{c.category}</span>
+              <div className="summary-chart-legend">
+                <div className="summary-list">
+                  {categoryBreakdown.map((c, i) => (
+                    <div key={i} className="summary-row">
+                      <div className="summary-row-left">
+                        <span className="color-dot" style={{ background: c.color }} />
+                        <span>{c.category}</span>
+                      </div>
+                      <div className="summary-row-right">
+                        <strong>{rupee(c.amount)}</strong>
+                        <span className="summary-pct">{c.percentage}%</span>
+                      </div>
                     </div>
-                    <div className="summary-row-right">
-                      <strong>{rupee(c.amount)}</strong>
-                      <span className="summary-pct">{c.percentage}%</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Per Person */}
         <div className="card">
@@ -61,8 +76,8 @@ export default function Summary({ data }) {
                 <span className="col-net">Net</span>
               </div>
             </div>
-            {perPerson && perPerson.map((p, i) => {
-              const isYou = p.name === perPerson[0]?.name
+            {perPerson.map((p, i) => {
+              const isYou = currentUserName && p.name === currentUserName
               return (
                 <div key={i} className={`summary-row${isYou ? ' is-you' : ''}`}>
                   <span className="summary-name">

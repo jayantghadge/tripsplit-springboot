@@ -28,14 +28,27 @@ export default function TripDetail() {
     Promise.all([
       api.getTrip(id),
       api.getMembers(id),
-      api.getExpenses(id)
-    ]).then(([t, m, e]) => {
+      api.getExpenses(id),
+      api.getSettlements(id).catch(() => []),
+      api.getSummary(id).catch(() => null)
+    ]).then(([t, m, e, s, sum]) => {
       setTrip(t)
       setMembers(m)
       setExpenses(e)
+      setSettlements(s || [])
+      setSummary(sum)
     }).catch(() => navigate('/trips', { replace: true }))
     .finally(() => setLoading(false))
   }, [id, navigate])
+
+  async function refreshDerived() {
+    const [s, sum] = await Promise.all([
+      api.calculateSettlements(id),
+      api.getSummary(id)
+    ])
+    setSettlements(s || [])
+    setSummary(sum)
+  }
 
   async function handleDeleteTrip() {
     if (!window.confirm('Delete this trip and all its data? This cannot be undone.')) return
@@ -50,12 +63,14 @@ export default function TripDetail() {
     setNewMemberName('')
     const m = await api.getMembers(id)
     setMembers(m)
+    await refreshDerived()
   }
 
   async function handleRemoveMember(memberId) {
     setMembers(prev => prev.filter(m => m.id !== memberId))
     try {
       await api.removeMember(id, memberId)
+      await refreshDerived()
     } catch {
       const m = await api.getMembers(id)
       setMembers(m)
@@ -64,8 +79,10 @@ export default function TripDetail() {
 
   async function handleDeleteExpense(expenseId) {
     if (!window.confirm('Delete this expense?')) return
-    setExpenses(prev => prev.filter(e => e.id !== expenseId))
     await api.deleteExpense(expenseId)
+    const e = await api.getExpenses(id)
+    setExpenses(e)
+    await refreshDerived()
   }
 
   function handleEditExpense(exp) {
@@ -73,18 +90,12 @@ export default function TripDetail() {
     setShowAddExpense(true)
   }
 
-  async function handleCalculate() {
+  function handleCalculate() {
     setActiveTab('settlements')
-    const result = await api.calculateSettlements(id)
-    setSettlements(result)
   }
 
-  async function handleShowSummary() {
+  function handleShowSummary() {
     setActiveTab('summary')
-    if (!summary) {
-      const s = await api.getSummary(id)
-      setSummary(s)
-    }
   }
 
   async function handleExpenseSaved() {
@@ -92,6 +103,7 @@ export default function TripDetail() {
     setEditingExpense(null)
     const e = await api.getExpenses(id)
     setExpenses(e)
+    await refreshDerived()
   }
 
   function handleCancelExpense() {
@@ -204,8 +216,11 @@ export default function TripDetail() {
         <div className="stat-card" style={{ padding: '14px 18px' }}>
           <div className="stat-icon stat-icon-green" style={{ width: 36, height: 36 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              <path d="M6 3h12" />
+              <path d="M6 8h12" />
+              <path d="m6 13 8.5 8" />
+              <path d="M6 13h3" />
+              <path d="M9 13c6.667 0 6.667-10 0-10" />
             </svg>
           </div>
           <div className="stat-info">
@@ -216,8 +231,11 @@ export default function TripDetail() {
         <div className="stat-card" style={{ padding: '14px 18px' }}>
           <div className="stat-icon stat-icon-amber" style={{ width: 36, height: 36 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              <path d="M6 3h12" />
+              <path d="M6 8h12" />
+              <path d="m6 13 8.5 8" />
+              <path d="M6 13h3" />
+              <path d="M9 13c6.667 0 6.667-10 0-10" />
             </svg>
           </div>
           <div className="stat-info">
@@ -284,8 +302,11 @@ export default function TripDetail() {
         <div className="card-header">
           <span className="card-label">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary-500)' }}>
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              <path d="M6 3h12" />
+              <path d="M6 8h12" />
+              <path d="m6 13 8.5 8" />
+              <path d="M6 13h3" />
+              <path d="M9 13c6.667 0 6.667-10 0-10" />
             </svg>
             Expenses
           </span>
@@ -352,8 +373,11 @@ export default function TripDetail() {
       <div className="tabs">
         <button className={`tab ${activeTab === 'settlements' ? 'tab-active' : ''}`} onClick={handleCalculate}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="1" x2="12" y2="23" />
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            <path d="M6 3h12" />
+            <path d="M6 8h12" />
+            <path d="m6 13 8.5 8" />
+            <path d="M6 13h3" />
+            <path d="M9 13c6.667 0 6.667-10 0-10" />
           </svg>
           Settlements
         </button>
@@ -368,7 +392,7 @@ export default function TripDetail() {
       {activeTab === 'settlements' && (
         <div className="tab-content">
           {uniqueSettlements.length === 0 ? (
-            <div className="empty-state">Click the Settlements tab to calculate who owes whom</div>
+            <div className="empty-state">No settlements yet. Add expenses and they will show up here automatically.</div>
           ) : (
             uniqueSettlements.map((s, i) => (
               <div key={`${s.fromName}-${s.toName}-${s.amount}-${i}`} className="settlement-row">
@@ -382,7 +406,7 @@ export default function TripDetail() {
         </div>
       )}
 
-      {activeTab === 'summary' && <Summary data={summary} />}
+      {activeTab === 'summary' && <Summary data={summary} currentUserName={user?.name} />}
     </div>
   )
 }

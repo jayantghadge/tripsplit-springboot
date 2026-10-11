@@ -135,20 +135,47 @@ public class ExpenseController {
             }
         }
 
-        List<Map<String, Object>> balances = members.stream().map(m -> {
-            Map<String, Object> b = new LinkedHashMap<>();
-            b.put("name", m.getName());
-            b.put("paid", paid.getOrDefault(m.getName(), BigDecimal.ZERO));
-            b.put("owes", owes.getOrDefault(m.getName(), BigDecimal.ZERO));
-            b.put("balance", paid.getOrDefault(m.getName(), BigDecimal.ZERO)
-                    .subtract(owes.getOrDefault(m.getName(), BigDecimal.ZERO)));
-            return b;
+        BigDecimal totalSpent = expenses.stream()
+                .map(e -> e.getAmount() != null ? e.getAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<Map<String, Object>> perPerson = members.stream().map(m -> {
+            BigDecimal p = paid.getOrDefault(m.getName(), BigDecimal.ZERO);
+            BigDecimal share = owes.getOrDefault(m.getName(), BigDecimal.ZERO);
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("name", m.getName());
+            row.put("paid", p);
+            row.put("share", share);
+            row.put("net", p.subtract(share));
+            return row;
         }).toList();
 
+        Map<String, BigDecimal> byCategory = new LinkedHashMap<>();
+        for (Expense e : expenses) {
+            String category = e.getCategory() != null && !e.getCategory().isBlank() ? e.getCategory() : "Uncategorized";
+            BigDecimal amount = e.getAmount() != null ? e.getAmount() : BigDecimal.ZERO;
+            byCategory.merge(category, amount, BigDecimal::add);
+        }
+
+        String[] palette = {"#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#ef4444", "#14b8a6", "#f97316"};
+        List<Map<String, Object>> categoryBreakdown = byCategory.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .map(entry -> {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("category", entry.getKey());
+                    row.put("amount", entry.getValue());
+                    double pct = totalSpent.compareTo(BigDecimal.ZERO) == 0 ? 0.0
+                            : entry.getValue().doubleValue() / totalSpent.doubleValue() * 100.0;
+                    row.put("percentage", Math.round(pct * 10.0) / 10.0);
+                    row.put("color", palette[Math.abs(entry.getKey().hashCode()) % palette.length]);
+                    return row;
+                }).toList();
+
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("balances", balances);
-        response.put("totalExpenses", expenses.stream().map(Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add));
+        response.put("totalSpent", totalSpent);
         response.put("memberCount", members.size());
+        response.put("perPerson", perPerson);
+        response.put("categoryBreakdown", categoryBreakdown);
         return ResponseEntity.ok(response);
     }
 }

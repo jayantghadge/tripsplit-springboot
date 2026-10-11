@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import ThemeToggle from './ThemeToggle'
 
 export default function Layout() {
   const { user, logout, isAdmin } = useAuth()
@@ -49,6 +50,7 @@ export default function Layout() {
             </div>
           </div>
           <div className="nav-right">
+            <ThemeToggle />
             {user && (
               <>
                 <span className="nav-user">

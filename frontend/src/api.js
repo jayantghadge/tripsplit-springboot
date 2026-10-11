@@ -53,6 +53,7 @@ export const api = {
 
   getSummary: (tripId) => request(`/api/expenses/trip/${tripId}/summary`),
 
+  getSettlements: (tripId) => request(`/api/settlements/trip/${tripId}`),
   calculateSettlements: (tripId) => request(`/api/settlements/trip/${tripId}/calculate`, { method: 'POST' }),
 
   getPublicTrip: (token) => request(`/api/public/trips/${token}`),

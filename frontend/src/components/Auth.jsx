@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import ThemeToggle from './ThemeToggle'
 
 export default function Auth() {
   const navigate = useNavigate()
@@ -38,6 +39,9 @@ export default function Auth() {
 
   return (
     <div className="auth-page">
+      <div style={{ position: 'absolute', top: 16, right: 16 }}>
+        <ThemeToggle />
+      </div>
       <div className="card auth-card">
         <div className="auth-header">
           <div className="auth-logo">
