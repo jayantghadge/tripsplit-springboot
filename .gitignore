@@ -20,3 +20,15 @@ src/main/resources/static/
 .DS_Store
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
+
+# TWA / Android
+twa/local.properties
+twa/keystore.properties
+twa/android.keystore
+twa/.gradle/
+twa/app/build/
+twa/build/
+twa/art/mipmap-*/
+twa/art/drawable-*/
+*.apk
+*.aab

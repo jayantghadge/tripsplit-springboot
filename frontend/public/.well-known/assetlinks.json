@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.jayantghadge.tripsplit",
+      "sha256_cert_fingerprints": [
+        "42:64:B1:05:9D:F0:52:62:E8:83:44:67:92:F5:DD:E9:8A:46:AC:BB:29:DB:F3:35:0F:0A:5E:04:4C:7D:92:36"
+      ]
+    }
+  }
+]

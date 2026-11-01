@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tripsplit_primary">#4F46E5</color>
+    <color name="tripsplit_primary_dark">#4338CA</color>
+    <color name="tripsplit_background">#FFFFFF</color>
+</resources>
